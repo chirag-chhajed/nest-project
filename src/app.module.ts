@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { EventsController } from './events.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Event } from './event.entity';
+import { Event } from './events/event.entity';
+import { EventsModule } from './events/events.module';
+import { AppJapanSercie } from './app.japan.service';
 
 @Module({
     imports: [
@@ -17,8 +18,14 @@ import { Event } from './event.entity';
             entities: [Event],
             synchronize: true,
         }),
+        EventsModule,
     ],
-    controllers: [AppController, EventsController],
-    providers: [AppService],
+    controllers: [AppController],
+    providers: [
+        {
+            provide: AppService,
+            useClass: AppJapanSercie,
+        },
+    ],
 })
 export class AppModule {}
