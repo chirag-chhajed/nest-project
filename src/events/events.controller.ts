@@ -11,13 +11,17 @@ import {
     ParseIntPipe,
     Logger,
     NotFoundException,
+    Query,
+    UsePipes,
 } from '@nestjs/common';
-import { CreateEventDto } from './create-event.dto';
-import { UpdateEventDto } from './update-event.dto';
+import { CreateEventDto } from './input/create-event.dto';
+import { UpdateEventDto } from './input/update-event.dto';
 import { Event } from './event.entity';
 import { MoreThan, Repository, Like } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Attendee } from './attendee.entity';
+import { EventsService } from './events.service';
+import { ListEvents } from './input/list.events';
 
 @Controller('/events')
 export class EventsController {
@@ -27,13 +31,24 @@ export class EventsController {
         private readonly repository: Repository<Event>,
         @InjectRepository(Attendee)
         private readonly attendeeRepository: Repository<Attendee>,
+        private readonly eventsService: EventsService,
     ) {}
 
     @Get()
-    async findAll() {
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async findAll(@Query() filter: ListEvents) {
+        this.logger.debug(filter.page);
         this.logger.log('Hit the findAll route');
-        const events = await this.repository.find();
-        this.logger.debug(`Found ${events.length} events`);
+        const events =
+            await this.eventsService.getEventsWithAttendeeCountFilteredPaginated(
+                filter,
+                {
+                    total: true,
+                    currentPage: filter.page,
+                    limit: 2,
+                },
+            );
+        // this.logger.debug(`Found ${events.length} events`);
         return events;
     }
 
@@ -82,10 +97,7 @@ export class EventsController {
         //     throw new NotFoundException();
         // }
         // what is async wrapper? it is a function that takes a function and returns a function that returns a promise that resolves to the return value of the original function
-        const event = await this.repository.findOne({
-            where: { id },
-            relations: ['attendees'],
-        });
+        const event = await this.eventsService.getEvent(id);
         if (!event) {
             throw new NotFoundException();
         }
@@ -118,7 +130,11 @@ export class EventsController {
     @Delete(':id')
     @HttpCode(204)
     async remove(@Param('id') id) {
-        const event = await this.repository.findOneBy({ id });
-        await this.repository.remove(event);
+        const result = await this.eventsService.deleteEvent(id);
+        if (result?.affected !== 1) {
+            throw new NotFoundException();
+        }
     }
 }
+
+// nestjs preserve watch output flag?

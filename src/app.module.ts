@@ -8,6 +8,8 @@ import { AppDummy } from './app.dummy';
 import { ConfigModule } from '@nestjs/config';
 import ormConfig from './config/orm.config';
 import ormConfigProd from './config/orm.config.prod';
+import { SchoolModule } from './school/school.module';
+import { AuthModule } from './auth/auth.module';
 
 // @injectable vs @Inject
 // @injectable() is a decorator that marks a class as available to be injected as a dependency.
@@ -26,6 +28,8 @@ import ormConfigProd from './config/orm.config.prod';
                     : ormConfigProd,
         }),
         EventsModule,
+        SchoolModule,
+        AuthModule,
     ],
     controllers: [AppController],
     // all the types of providers below explanation
