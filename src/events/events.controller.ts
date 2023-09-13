@@ -99,14 +99,6 @@ export class EventsController {
     @Get(':id')
     @UseInterceptors(ClassSerializerInterceptor)
     async findOne(@Param('id', ParseIntPipe) id: number) {
-        // console.log(typeof id);
-        // wrap this in try catch block
-        // try {
-        //     const event = await this.repository.findOneBy({ id });
-        //     return event;
-        // } catch (e) {
-        //     throw new NotFoundException();
-        // }
         // what is async wrapper? it is a function that takes a function and returns a function that returns a promise that resolves to the return value of the original function
         const event = await this.eventsService.getEvent(id);
         if (!event) {
