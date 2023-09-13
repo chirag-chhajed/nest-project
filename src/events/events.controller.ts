@@ -35,13 +35,7 @@ import { AuthGuardJwt } from 'src/auth/auth-guard.jwt';
 @SerializeOptions({ strategy: 'excludeAll' })
 export class EventsController {
     private readonly logger = new Logger(EventsController.name);
-    constructor(
-        @InjectRepository(Event)
-        private readonly repository: Repository<Event>,
-        @InjectRepository(Attendee)
-        private readonly attendeeRepository: Repository<Attendee>,
-        private readonly eventsService: EventsService,
-    ) {}
+    constructor(private readonly eventsService: EventsService) {}
 
     @Get()
     @UsePipes(new ValidationPipe({ transform: true }))

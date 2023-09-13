@@ -20,6 +20,8 @@ import { AuthModule } from './auth/auth.module';
             isGlobal: true,
             load: [ormConfig],
             expandVariables: true,
+            envFilePath:
+                process.env.NODE_ENV === 'dev' ? 'dev.env.' : 'e2e.env',
         }),
         TypeOrmModule.forRootAsync({
             useFactory:
