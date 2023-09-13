@@ -22,7 +22,7 @@ import {
 import { CreateEventDto } from './input/create-event.dto';
 import { UpdateEventDto } from './input/update-event.dto';
 import { Event } from './event.entity';
-import { MoreThan, Repository, Like } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Attendee } from './attendee.entity';
 import { EventsService } from './events.service';
