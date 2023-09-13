@@ -100,7 +100,7 @@ export class EventsController {
     @UseInterceptors(ClassSerializerInterceptor)
     async findOne(@Param('id', ParseIntPipe) id: number) {
         // what is async wrapper? it is a function that takes a function and returns a function that returns a promise that resolves to the return value of the original function
-        const event = await this.eventsService.getEvent(id);
+        const event = await this.eventsService.getEventWithAttendeeCount(id);
         if (!event) {
             throw new NotFoundException();
         }
@@ -118,11 +118,11 @@ export class EventsController {
     @UseGuards(AuthGuardJwt)
     @UseInterceptors(ClassSerializerInterceptor)
     async update(
-        @Param('id') id,
+        @Param('id', ParseIntPipe) id,
         @Body(new ValidationPipe({ groups: ['create'] })) input: UpdateEventDto,
         @CurrentUser() user: User,
     ) {
-        const event = await this.repository.findOneBy({ id });
+        const event = await this.eventsService.findOne(id);
         if (!event) throw new NotFoundException();
 
         if (event.organizerId !== user.id) {
@@ -137,8 +137,8 @@ export class EventsController {
     @Delete(':id')
     @UseGuards(AuthGuardJwt)
     @HttpCode(204)
-    async remove(@Param('id') id, @CurrentUser() user: User) {
-        const event = await this.eventsService.getEvent(id);
+    async remove(@Param('id', ParseIntPipe) id, @CurrentUser() user: User) {
+        const event = await this.eventsService.findOne(id);
         if (!event) throw new NotFoundException();
 
         if (event.organizerId !== user.id) {
